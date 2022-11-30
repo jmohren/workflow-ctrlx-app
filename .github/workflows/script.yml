@@ -6,12 +6,15 @@ on: push
 jobs:
   main:
     runs-on: ubuntu-20.04 #ubuntu-latest
+    env: 
+      path-apps: apps
+      path-imgs: ctrlx-imgs
 
     steps:
       - name: Checkout
         uses: actions/checkout@v3
         with: 
-          path: apps
+          path: $path-apps
 
       - 
         name: Check out my other private repo
@@ -20,7 +23,7 @@ jobs:
           repository: boschrexroth/ctrlx-os-imgs
           ssh-key: ${{ secrets.JMOHREN_KEY }}
           lfs: true
-          path: ctrlx-imgs
+          path: $path-imgs
 
       - name: Install apps
         run: |
@@ -30,6 +33,8 @@ jobs:
       - 
         name: Start ctrlX OS
         uses: jmohren/ctrlx-actions/start-ctrlx-os@v1
+        with:
+          path-img: $path-imgs
 
       - 
         name: Build datalayer.provider app
@@ -37,7 +42,7 @@ jobs:
         uses: boschrexroth/ctrlx-actions/build-snap@v1
         with: 
             architecture: amd64
-            path-app: datalayer.provider.all-data
+            path-app: $path-apps/datalayer.provider.all-data
 
       - 
         name: Build datalayer.client app
@@ -45,7 +50,7 @@ jobs:
         uses: boschrexroth/ctrlx-actions/build-snap@v1
         with: 
             architecture: amd64
-            path-app: datalayerclient
+            path-app: $path-apps/datalayerclient
 
       - name: Install apps
         run: |
