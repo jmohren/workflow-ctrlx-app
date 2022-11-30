@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-20.04 #ubuntu-latest
     env: 
       path-apps: apps
-      path-imgs: ctrlx-imgs
+      path-imgs: imgs
 
     steps:
       - name: Checkout
