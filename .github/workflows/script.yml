@@ -11,10 +11,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      
+      - 
+        name: Check out my other private repo
+        uses: actions/checkout@v3
+        with:
+          repository: boschrexroth/ctrlx-os-imgs
+          ssh-key: ${{ secrets.JMOHREN_KEY }}
+          lfs: true
 
       - name: Install apps
         run: |
+          cd
           ls
           cd datalayer.provider.all-data
 
