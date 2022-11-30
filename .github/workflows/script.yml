@@ -26,7 +26,7 @@ jobs:
       - 
         name: Build datalayer.provider app
         id: provider-amd64
-        uses: boschrexoth/ctrlx-actions/build-snap@v1
+        uses: boschrexroth/ctrlx-actions/build-snap@v1
         with: 
             architecture: amd64
             path-app: datalayer.provider.all-data
@@ -34,7 +34,7 @@ jobs:
       - 
         name: Build datalayer.client app
         id: client-amd64
-        uses: boschrexoth/ctrlx-actions/build-snap@v1
+        uses: boschrexroth/ctrlx-actions/build-snap@v1
         with: 
             architecture: amd64
             path-app: datalayerclient
