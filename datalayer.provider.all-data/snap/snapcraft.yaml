@@ -1,0 +1,45 @@
+name: sdk-py-provider-alldata
+version: 2.1.0
+summary: ctrlX Data Layer provider sample in Python
+title: sdk-py-provider-alldata
+description: |
+  ctrlX Data Layer provider in Python publishing nodes of all data types
+base: core20
+confinement: strict
+grade: stable
+
+apps:
+  provider:
+    command: bin/main.py
+    plugs:
+      - network
+      - datalayer
+    daemon: simple
+    passthrough:
+      restart-condition: always
+      restart-delay: 10s 
+
+parts:
+  provider:
+    plugin: python
+    source: .
+
+  datalayerdeb:
+      plugin: dump
+      source: ./tmp/ctrlx-datalayer.deb
+      source-type: deb
+      stage-packages:
+        - libzmq5
+      override-pull: |
+        mkdir -p ../../../tmp/
+        curl -s https://api.github.com/repos/boschrexroth/ctrlx-automation-sdk/releases/latest | grep "browser_download_url.*deb" | cut -d : -f 2,3 | tr -d \" | wget -qi - -O ../../../tmp/ctrlx-datalayer.deb
+        snapcraftctl pull
+      override-prime: |
+        rm -rf ../../../tmp
+        snapcraftctl prime
+
+plugs:
+  datalayer:
+    interface: content
+    content: datalayer
+    target: $SNAP_DATA/.datalayer 

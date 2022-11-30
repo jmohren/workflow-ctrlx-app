@@ -1,0 +1,45 @@
+name: sdk-py-client-light
+version: 2.1.0
+summary: Data Layer client sample written in Python for ctrlX.
+title: sdk-py-client-light
+description: |
+  The sample demonstrates how to read values from ctrlX Data Layer tree and write out the values to console. 
+base: core20
+confinement: strict
+grade: stable
+
+apps:
+  client:
+    command: bin/main.py
+    plugs:
+      - network
+      - datalayer
+    daemon: simple
+    passthrough:
+      restart-condition: always
+      restart-delay: 10s 
+      
+parts:
+  client:
+    plugin: python
+    source: .
+
+  datalayerdeb:
+      plugin: dump
+      source: ./tmp/ctrlx-datalayer.deb
+      source-type: deb
+      stage-packages:
+        - libzmq5
+      override-pull: |
+        mkdir -p ../../../tmp/
+        curl -s https://api.github.com/repos/boschrexroth/ctrlx-automation-sdk/releases/latest | grep "browser_download_url.*deb" | cut -d : -f 2,3 | tr -d \" | wget -qi - -O ../../../tmp/ctrlx-datalayer.deb
+        snapcraftctl pull
+      override-prime: |
+        rm -rf ../../../tmp
+        snapcraftctl prime
+
+plugs:
+  datalayer:
+    interface: content
+    content: datalayer
+    target: $SNAP_DATA/.datalayer 

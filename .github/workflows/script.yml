@@ -1,0 +1,235 @@
+
+name: builder
+
+on: push
+
+jobs:
+  main:
+    runs-on: ubuntu-20.04 #ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - 
+        name: Check out my other private repo
+        uses: actions/checkout@v3
+        with:
+          repository: boschrexroth/ctrlx-os-imgs
+          ssh-key: ${{ secrets.JMOHREN_KEY }}
+          lfs: true
+
+      - 
+        name: Start ctrlX OS
+        uses: jmohren/ctrlx-actions/start-ctrlx-os@v1
+
+      - 
+        name: Build datalayer.provider app
+        id: provider-amd64
+        uses: boschrexoth/ctrlx-actions/build-snap@v1
+        with: 
+            architecture: amd64
+            path-app: datalayer.provider.all-data
+
+      - 
+        name: Build datalayer.client app
+        id: client-amd64
+        uses: boschrexoth/ctrlx-actions/build-snap@v1
+        with: 
+            architecture: amd64
+            path-app: datalayerclient
+
+      - name: Install apps
+        run: |
+          #Get auth token
+          for i in {1..16}
+          do
+            sleep 1m
+            echo $(curl -s -k -X 'POST' \
+              'https://127.0.0.1:8443/identity-manager/api/v2/auth/token?dryrun=false' \
+              -H 'accept: application/json' \
+              -H 'Content-Type: application/json' \
+              -d '{
+              "password": "jmohren",
+              "name": "jmohren"
+              }') > token.json
+              if [[ $(cat token.json | jq 'has("access_token")') ]]
+              then
+                echo "Get auth token ($i min): Retrieved authentication token sucessfully" && break
+              elif [[ $i == 16 ]]
+              then
+                echo ::error::"Get auth token ($i min): Timeout no connection possible" && exit 1
+              else
+                echo "Get auth token ($i min): No successful response, wait and retry..."
+              fi
+          done
+          #
+          echo ${{steps.provider-amd64.outputs.path-snap}}
+          echo ${{steps.client-amd64.outputs.path-snap}}
+
+          #Allow installing from unknown sources
+          echo Enable installation from unknown sources
+          curl -s -k -X 'PUT' \
+          'https://127.0.0.1:8443/package-manager/api/v1/settings' \
+          -H 'accept: */*' \
+          -H "Authorization: Bearer $(cat token.json | jq '.access_token')" \
+          -H 'Content-Type: application/json' \
+          -d '{
+          "allowUnknownApps": true
+          }'
+
+          echo Install provider app
+          echo $(curl -k -X 'POST' \
+          'https://127.0.0.1:8443/package-manager/api/v1/packages' \
+          -H 'accept: */*' \
+          -H 'Content-Type: multipart/form-data' \
+          -H "Authorization: Bearer $(cat token.json | jq '.access_token')" \
+          -F 'file=@${{steps.provider-amd64.outputs.path-snap}}' \
+          -F 'update=false')
+
+          sleep 2m
+
+          echo Install client app
+          echo $(curl -k -X 'POST' \
+          'https://127.0.0.1:8443/package-manager/api/v1/packages' \
+          -H 'accept: */*' \
+          -H 'Content-Type: multipart/form-data' \
+          -H "Authorization: Bearer $(cat token.json | jq '.access_token')" \
+          -F 'file=@${{steps.client-amd64.outputs.path-snap}}' \
+          -F 'update=false')
+
+          # sdk-py-provider-alldata_2.1.0_amd64.snap
+          # sdk-py-client-light_2.1.0_amd64.snap
+
+          sleep 2m
+          echo $(curl -k -X 'GET' \
+          'https://127.0.0.1:8443/package-manager/api/v1/packages' \
+          -H 'accept: application/json' \
+          -H "Authorization: Bearer $(cat token.json | jq '.access_token')")
+        shell: bash
+
+      - name: Testing inlier
+        run: |
+          #Feature 1
+          curl -s -k -X 'PUT' \
+          'https://127.0.0.1:8443/automation/api/v2/nodes/sdk-py-provider-alldata/input/feature_1' \
+          -H 'accept: */*' \
+          -H "Authorization: Bearer $(cat token.json | jq '.access_token')" \
+          -H 'Content-Type: application/json' \
+          -d '{
+          "type": "double",
+          "value": 0
+          }'
+
+          #Feature 2
+          curl -s -k -X 'PUT' \
+          'https://127.0.0.1:8443/automation/api/v2/nodes/sdk-py-provider-alldata/input/feature_2' \
+          -H 'accept: */*' \
+          -H "Authorization: Bearer $(cat token.json | jq '.access_token')" \
+          -H 'Content-Type: application/json' \
+          -d '{
+          "type": "double",
+          "value": 0
+          }'
+
+          #Feature 3
+          curl -s -k -X 'PUT' \
+          'https://127.0.0.1:8443/automation/api/v2/nodes/sdk-py-provider-alldata/input/feature_3' \
+          -H 'accept: */*' \
+          -H "Authorization: Bearer $(cat token.json | jq '.access_token')" \
+          -H 'Content-Type: application/json' \
+          -d '{
+          "type": "double",
+          "value": 0
+          }'
+
+          #Test
+          curl -s -k -X 'PUT' \
+          'https://127.0.0.1:8443/automation/api/v2/nodes/sdk-py-provider-alldata/prediction/anomaly' \
+          -H 'accept: */*' \
+          -H "Authorization: Bearer $(cat token.json | jq '.access_token')" \
+          -H 'Content-Type: application/json' \
+          -d '{
+          "type": "int",
+          "value": 1
+          }'
+
+          sleep 20s
+
+          prediction=$(curl -s -k -X 'GET' \
+          'https://127.0.0.1:8443/automation/api/v2/nodes/sdk-py-provider-alldata/prediction/anomaly' \
+          -H 'accept: application/json' \
+          -H "Authorization: Bearer $(cat token.json | jq '.access_token')") | jq -r '.value'
+
+          echo "prediction: $prediction"
+
+          if [[ $prediction == 1 ]]
+          then
+              echo Prediction is correct
+          else
+              echo Prediction is not correct
+          fi
+        shell: bash
+
+      - name: Testing outlier
+        run: |
+          #Feature 1
+          curl -s -k -X 'PUT' \
+          'https://127.0.0.1:8443/automation/api/v2/nodes/sdk-py-provider-alldata/input/feature_1' \
+          -H 'accept: */*' \
+          -H "Authorization: Bearer $(cat token.json | jq '.access_token')" \
+          -H 'Content-Type: application/json' \
+          -d '{
+          "type": "double",
+          "value": 13
+          }'
+
+          #Feature 2
+          curl -s -k -X 'PUT' \
+          'https://127.0.0.1:8443/automation/api/v2/nodes/sdk-py-provider-alldata/input/feature_2' \
+          -H 'accept: */*' \
+          -H "Authorization: Bearer $(cat token.json | jq '.access_token')" \
+          -H 'Content-Type: application/json' \
+          -d '{
+          "type": "double",
+          "value": 14
+          }'
+
+          #Feature 3
+          curl -s -k -X 'PUT' \
+          'https://127.0.0.1:8443/automation/api/v2/nodes/sdk-py-provider-alldata/input/feature_3' \
+          -H 'accept: */*' \
+          -H "Authorization: Bearer $(cat token.json | jq '.access_token')" \
+          -H 'Content-Type: application/json' \
+          -d '{
+          "type": "double",
+          "value": 14
+          }'
+
+          #Test
+          curl -s -k -X 'PUT' \
+          'https://127.0.0.1:8443/automation/api/v2/nodes/sdk-py-provider-alldata/prediction/anomaly' \
+          -H 'accept: */*' \
+          -H "Authorization: Bearer $(cat token.json | jq '.access_token')" \
+          -H 'Content-Type: application/json' \
+          -d '{
+          "type": "int",
+          "value": -1
+          }'
+
+          sleep 20s
+          
+          prediction=$(curl -s -k -X 'GET' \
+          'https://127.0.0.1:8443/automation/api/v2/nodes/sdk-py-provider-alldata/prediction/anomaly' \
+          -H 'accept: application/json' \
+          -H "Authorization: Bearer $(cat token.json | jq '.access_token')") | jq -r '.value'
+
+          echo "prediction: $prediction"
+
+          if [[ $prediction == -1 ]]
+          then
+              echo Prediction is correct
+          else
+              echo Prediction is not correct
+          fi
+        shell: bash
