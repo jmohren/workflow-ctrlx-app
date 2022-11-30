@@ -19,6 +19,11 @@ jobs:
           ssh-key: ${{ secrets.JMOHREN_KEY }}
           lfs: true
 
+      - name: Install apps
+        run: |
+          ls
+          cd datalayer.provider.all-data
+
       - 
         name: Start ctrlX OS
         uses: jmohren/ctrlx-actions/start-ctrlx-os@v1
