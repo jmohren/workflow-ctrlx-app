@@ -24,12 +24,8 @@ jobs:
 
       - name: Install apps
         run: |
-          cd
-          ls
-          cd apps
-          ls
-          cd ctrlx-imgs
-          ls
+          sudo apt-get install tree
+          tree
 
       - 
         name: Start ctrlX OS
