@@ -10,6 +10,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with: 
+          path: apps
 
       - 
         name: Check out my other private repo
@@ -18,12 +20,16 @@ jobs:
           repository: boschrexroth/ctrlx-os-imgs
           ssh-key: ${{ secrets.JMOHREN_KEY }}
           lfs: true
+          path: ctrlx-imgs
 
       - name: Install apps
         run: |
           cd
           ls
-          cd datalayer.provider.all-data
+          cd apps
+          ls
+          cd ctrlx-imgs
+          ls
 
       - 
         name: Start ctrlX OS
