@@ -6,15 +6,18 @@ on: push
 jobs:
   main:
     runs-on: ubuntu-20.04 #ubuntu-latest
-    env: 
-      PATH_APPS: $(pwd)/apps
-      PATH_IMGS: $(pwd)/imgs
 
     steps:
+      - name: Set env
+        run: |
+          echo "PATH_APPS=$(pwd)/apps" >> $GITHUB_ENV
+          echo "PATH_IMGS=$(pwd)/imgs" >> $GITHUB_ENV
+        shell: bash
+
       - name: Checkout
         uses: actions/checkout@v3
         with: 
-          path: "$PATH_APPS"
+          path: $PATH_APPS
 
       - 
         name: Check out my other private repo
@@ -23,7 +26,7 @@ jobs:
           repository: boschrexroth/ctrlx-os-imgs
           ssh-key: ${{ secrets.JMOHREN_KEY }}
           lfs: true
-          path: "$PATH_IMGS"
+          path: $PATH_IMGS
 
       - name: Get tree
         run: |
