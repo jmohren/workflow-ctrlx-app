@@ -42,13 +42,13 @@ jobs:
             architecture: amd64
             path-app-files: ${{ env.PATH_APPS }}/datalayer.provider.all-data
 
-      - 
-        name: Build datalayer.client app
-        id: client-amd64
-        uses: boschrexroth/ctrlx-actions/build-snap@v1
-        with: 
-            architecture: amd64
-            path-app-files: ${{ env.PATH_APPS }}/datalayerclient
+      # - 
+      #   name: Build datalayer.client app
+      #   id: client-amd64
+      #   uses: boschrexroth/ctrlx-actions/build-snap@v1
+      #   with: 
+      #       architecture: amd64
+      #       path-app-files: ${{ env.PATH_APPS }}/datalayerclient
 
       - name: Install apps
         run: |
@@ -100,147 +100,102 @@ jobs:
 
           sleep 2m
 
-          echo Install client app
-          echo $(curl -k -X 'POST' \
-          'https://127.0.0.1:8443/package-manager/api/v1/packages' \
-          -H 'accept: */*' \
-          -H 'Content-Type: multipart/form-data' \
-          -H "Authorization: Bearer $(cat token.json | jq '.access_token')" \
-          -F 'file=@${{steps.client-amd64.outputs.path-snap}}' \
-          -F 'update=false')
+          # echo Install client app
+          # echo $(curl -k -X 'POST' \
+          # 'https://127.0.0.1:8443/package-manager/api/v1/packages' \
+          # -H 'accept: */*' \
+          # -H 'Content-Type: multipart/form-data' \
+          # -H "Authorization: Bearer $(cat token.json | jq '.access_token')" \
+          # -F 'file=@${{steps.client-amd64.outputs.path-snap}}' \
+          # -F 'update=false')
 
           # sdk-py-provider-alldata_2.1.0_amd64.snap
           # sdk-py-client-light_2.1.0_amd64.snap
 
-          sleep 2m
-          echo $(curl -k -X 'GET' \
-          'https://127.0.0.1:8443/package-manager/api/v1/packages' \
-          -H 'accept: application/json' \
-          -H "Authorization: Bearer $(cat token.json | jq '.access_token')")
+          # sleep 2m
+          # echo $(curl -k -X 'GET' \
+          # 'https://127.0.0.1:8443/package-manager/api/v1/packages' \
+          # -H 'accept: application/json' \
+          # -H "Authorization: Bearer $(cat token.json | jq '.access_token')")
         shell: bash
 
-      - name: Testing inlier
+      - name: Testing provider app
         run: |
-          #Feature 1
-          curl -s -k -X 'PUT' \
-          'https://127.0.0.1:8443/automation/api/v2/nodes/sdk-py-provider-alldata/input/feature_1' \
-          -H 'accept: */*' \
-          -H "Authorization: Bearer $(cat token.json | jq '.access_token')" \
-          -H 'Content-Type: application/json' \
-          -d '{
-          "type": "double",
-          "value": 0
-          }'
+          ### Read ###
+          test_int=$(curl -s -k -X 'GET' \
+          'https://127.0.0.1:8443/automation/api/v2/nodes/sdk-py-provider-alldata/test_nodes/test_int' \
+          -H 'accept: application/json' \
+          -H "Authorization: Bearer $(cat token.json | jq '.access_token')") | jq -r '.value'
 
-          #Feature 2
-          curl -s -k -X 'PUT' \
-          'https://127.0.0.1:8443/automation/api/v2/nodes/sdk-py-provider-alldata/input/feature_2' \
-          -H 'accept: */*' \
-          -H "Authorization: Bearer $(cat token.json | jq '.access_token')" \
-          -H 'Content-Type: application/json' \
-          -d '{
-          "type": "double",
-          "value": 0
-          }'
+          if [[ $test_int == 0 ]]
+          then
+              echo Test of int was successful: $test_int
+          else
+              echo Test of int was not successful: $test_int
+          fi
 
-          #Feature 3
-          curl -s -k -X 'PUT' \
-          'https://127.0.0.1:8443/automation/api/v2/nodes/sdk-py-provider-alldata/input/feature_3' \
-          -H 'accept: */*' \
-          -H "Authorization: Bearer $(cat token.json | jq '.access_token')" \
-          -H 'Content-Type: application/json' \
-          -d '{
-          "type": "double",
-          "value": 0
-          }'
+          test_string=$(curl -s -k -X 'GET' \
+          'https://127.0.0.1:8443/automation/api/v2/nodes/sdk-py-provider-alldata/test_nodes/test_string' \
+          -H 'accept: application/json' \
+          -H "Authorization: Bearer $(cat token.json | jq '.access_token')") | jq -r '.value'
 
-          #Test
+          if [[ $test_string == "Creation Test" ]]
+          then
+              echo Test of string was successful: $test_string
+          else
+              echo Test of string was not successful: $test_string
+          fi
+
+          ### Write ###
           curl -s -k -X 'PUT' \
-          'https://127.0.0.1:8443/automation/api/v2/nodes/sdk-py-provider-alldata/prediction/anomaly' \
+          'https://127.0.0.1:8443/automation/api/v2/nodes/sdk-py-provider-alldata/test_nodes/test_int' \
           -H 'accept: */*' \
           -H "Authorization: Bearer $(cat token.json | jq '.access_token')" \
           -H 'Content-Type: application/json' \
           -d '{
           "type": "int",
-          "value": 1
+          "value": 0
           }'
 
-          sleep 20s
+          curl -s -k -X 'PUT' \
+          'https://127.0.0.1:8443/automation/api/v2/nodes/sdk-py-provider-alldata/test_nodes/test_string' \
+          -H 'accept: */*' \
+          -H "Authorization: Bearer $(cat token.json | jq '.access_token')" \
+          -H 'Content-Type: application/json' \
+          -d '{
+          "type": "string",
+          "value": "Write Test"
+          }'
 
-          prediction=$(curl -s -k -X 'GET' \
-          'https://127.0.0.1:8443/automation/api/v2/nodes/sdk-py-provider-alldata/prediction/anomaly' \
+          ### Read ###
+          test_int=$(curl -s -k -X 'GET' \
+          'https://127.0.0.1:8443/automation/api/v2/nodes/sdk-py-provider-alldata/test_nodes/test_int' \
           -H 'accept: application/json' \
           -H "Authorization: Bearer $(cat token.json | jq '.access_token')") | jq -r '.value'
 
-          echo "prediction: $prediction"
-
-          if [[ $prediction == 1 ]]
+          if [[ $test_int == 0 ]]
           then
-              echo Prediction is correct
+              echo Test of int was successful: $test_int
           else
-              echo Prediction is not correct
+              echo Test of int was not successful: $test_int
           fi
-        shell: bash
 
-      - name: Testing outlier
-        run: |
-          #Feature 1
-          curl -s -k -X 'PUT' \
-          'https://127.0.0.1:8443/automation/api/v2/nodes/sdk-py-provider-alldata/input/feature_1' \
-          -H 'accept: */*' \
-          -H "Authorization: Bearer $(cat token.json | jq '.access_token')" \
-          -H 'Content-Type: application/json' \
-          -d '{
-          "type": "double",
-          "value": 13
-          }'
-
-          #Feature 2
-          curl -s -k -X 'PUT' \
-          'https://127.0.0.1:8443/automation/api/v2/nodes/sdk-py-provider-alldata/input/feature_2' \
-          -H 'accept: */*' \
-          -H "Authorization: Bearer $(cat token.json | jq '.access_token')" \
-          -H 'Content-Type: application/json' \
-          -d '{
-          "type": "double",
-          "value": 14
-          }'
-
-          #Feature 3
-          curl -s -k -X 'PUT' \
-          'https://127.0.0.1:8443/automation/api/v2/nodes/sdk-py-provider-alldata/input/feature_3' \
-          -H 'accept: */*' \
-          -H "Authorization: Bearer $(cat token.json | jq '.access_token')" \
-          -H 'Content-Type: application/json' \
-          -d '{
-          "type": "double",
-          "value": 14
-          }'
-
-          #Test
-          curl -s -k -X 'PUT' \
-          'https://127.0.0.1:8443/automation/api/v2/nodes/sdk-py-provider-alldata/prediction/anomaly' \
-          -H 'accept: */*' \
-          -H "Authorization: Bearer $(cat token.json | jq '.access_token')" \
-          -H 'Content-Type: application/json' \
-          -d '{
-          "type": "int",
-          "value": -1
-          }'
-
-          sleep 20s
-          
-          prediction=$(curl -s -k -X 'GET' \
-          'https://127.0.0.1:8443/automation/api/v2/nodes/sdk-py-provider-alldata/prediction/anomaly' \
+          test_string=$(curl -s -k -X 'GET' \
+          'https://127.0.0.1:8443/automation/api/v2/nodes/sdk-py-provider-alldata/test_nodes/test_string' \
           -H 'accept: application/json' \
           -H "Authorization: Bearer $(cat token.json | jq '.access_token')") | jq -r '.value'
 
-          echo "prediction: $prediction"
-
-          if [[ $prediction == -1 ]]
+          if [[ $test_string == "Creation Test" ]]
           then
-              echo Prediction is correct
+              echo Test of string was successful: $test_string
           else
-              echo Prediction is not correct
+              echo Test of string was not successful: $test_string
           fi
         shell: bash
+
+      - 
+        name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v2.1.0
+          files: ${{steps.provider-amd64.outputs.path-snap}}

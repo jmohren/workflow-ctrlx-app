@@ -51,8 +51,9 @@ def main():
 
         nodeManager = NodeManagerAllData(
             provider, "sdk-py-provider-alldata/")
-        nodeManager.create_prediction_node()
-        nodeManager.create_input_nodes()
+        # nodeManager.create_prediction_node()
+        # nodeManager.create_input_nodes()
+        nodeManager.create_test_nodes()
 
         while provider.is_connected():
             time.sleep(10.0)

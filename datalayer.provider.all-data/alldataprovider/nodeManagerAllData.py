@@ -32,31 +32,44 @@ class NodeManagerAllData:
         self.addressRoot = addressRoot
         self.nodes = []
 
-    def create_prediction_node(self):
-        addressBranch = self.addressRoot + "prediction/"
+    def create_test_nodes(self):
+        addressBranch = self.addressRoot + "test_nodes/"
 
         data = Variant()
         data.set_int8(0)
-        self.create_single_node(addressBranch, "", "anomaly",
+        self.create_single_node(addressBranch, "", "test_int",
                                 "unit", "description", True, data)
-
-    def create_input_nodes(self, ):
-        addressBranch = self.addressRoot + "input/"
 
         data = Variant()
-        data.set_float64(13.4626)
-        self.create_single_node(addressBranch, "", "feature_1",
+        data.set_string("Creation Test")
+        self.create_single_node(addressBranch, "", "test_string",
                                 "unit", "description", True, data)
+
+    # def create_prediction_node(self):
+    #     addressBranch = self.addressRoot + "prediction/"
+
+    #     data = Variant()
+    #     data.set_int8(0)
+    #     self.create_single_node(addressBranch, "", "anomaly",
+    #                             "unit", "description", True, data)
+
+    # def create_input_nodes(self, ):
+    #     addressBranch = self.addressRoot + "input/"
+
+    #     data = Variant()
+    #     data.set_float64(13.4626)
+    #     self.create_single_node(addressBranch, "", "feature_1",
+    #                             "unit", "description", True, data)
         
-        data = Variant()
-        data.set_float64(14.4626)
-        self.create_single_node(addressBranch, "", "feature_2",
-                                "unit", "description", True, data)
+    #     data = Variant()
+    #     data.set_float64(14.4626)
+    #     self.create_single_node(addressBranch, "", "feature_2",
+    #                             "unit", "description", True, data)
 
-        data = Variant()
-        data.set_float64(15.4626)
-        self.create_single_node(addressBranch, "", "feature_3",
-                                "unit", "description", True, data)
+    #     data = Variant()
+    #     data.set_float64(15.4626)
+    #     self.create_single_node(addressBranch, "", "feature_3",
+    #                             "unit", "description", True, data)
 
         # data = Variant()
         # data.set_array_float64([64.1, 64.2, 64.3])
