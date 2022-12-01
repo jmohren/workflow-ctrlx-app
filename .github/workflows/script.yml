@@ -136,6 +136,11 @@ jobs:
       - name: Testing provider app
         run: |
           ### Read ###
+          echo $(curl -k -X 'GET' \
+          'https://127.0.0.1:8443/automation/api/v2/nodes/sdk-py-provider-alldata%2Ftest_nodes%2Ftest_int' \
+          -H 'accept: application/json' \
+          -H 'Authorization: Bearer $(cat token.json)')
+          
           test_int=$(curl -k -X 'GET' \
           'https://127.0.0.1:8443/automation/api/v2/nodes/sdk-py-provider-alldata/test_nodes/test_int' \
           -H 'accept: application/json' \
