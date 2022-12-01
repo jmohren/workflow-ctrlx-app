@@ -14,7 +14,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with: 
-          path: $PATH_APPS
+          path: PATH_APPS
 
       - 
         name: Check out my other private repo
