@@ -82,7 +82,7 @@ jobs:
               -d '{
               "password": "boschrexroth",
               "name": "boschrexroth"
-              }' | jq '.access_token')) > token.json
+              }' | jq '.access_token') > token.json
           
           ls
           cat token.json
