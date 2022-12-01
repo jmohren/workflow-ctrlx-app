@@ -95,7 +95,7 @@ jobs:
           curl -s -k -X 'PUT' \
           'https://127.0.0.1:8443/package-manager/api/v1/settings' \
           -H 'accept: */*' \
-          -H "Authorization: Bearer $(cat token.json | jq '.access_token')" \
+          -H "Authorization: Bearer $(cat token.json)" \
           -H 'Content-Type: application/json' \
           -d '{
           "allowUnknownApps": true
@@ -106,7 +106,7 @@ jobs:
           'https://127.0.0.1:8443/package-manager/api/v1/packages' \
           -H 'accept: */*' \
           -H 'Content-Type: multipart/form-data' \
-          -H "Authorization: Bearer $(cat token.json | jq '.access_token')" \
+          -H "Authorization: Bearer $(cat token.json)" \
           -F 'file=@${{steps.provider-amd64.outputs.path-snap}}' \
           -F 'update=false')
 
@@ -117,7 +117,7 @@ jobs:
           # 'https://127.0.0.1:8443/package-manager/api/v1/packages' \
           # -H 'accept: */*' \
           # -H 'Content-Type: multipart/form-data' \
-          # -H "Authorization: Bearer $(cat token.json | jq '.access_token')" \
+          # -H "Authorization: Bearer $(cat token.json)" \
           # -F 'file=@${{steps.client-amd64.outputs.path-snap}}' \
           # -F 'update=false')
 
@@ -128,7 +128,7 @@ jobs:
           echo $(curl -k -X 'GET' \
           'https://127.0.0.1:8443/package-manager/api/v1/packages' \
           -H 'accept: application/json' \
-          -H "Authorization: Bearer $(cat token.json | jq '.access_token')")
+          -H "Authorization: Bearer $(cat token.json)")
         shell: bash
 
       - name: Testing provider app
@@ -137,7 +137,7 @@ jobs:
           test_int=$(curl -k -X 'GET' \
           'https://127.0.0.1:8443/automation/api/v2/nodes/sdk-py-provider-alldata/test_nodes/test_int' \
           -H 'accept: application/json' \
-          -H "Authorization: Bearer $(cat token.json | jq '.access_token')") | jq -r '.value'
+          -H "Authorization: Bearer $(cat token.json)") | jq -r '.value'
 
           if [[ $test_int == 0 ]]
           then
@@ -149,7 +149,7 @@ jobs:
           test_string=$(curl -k -X 'GET' \
           'https://127.0.0.1:8443/automation/api/v2/nodes/sdk-py-provider-alldata/test_nodes/test_string' \
           -H 'accept: application/json' \
-          -H "Authorization: Bearer $(cat token.json | jq '.access_token')") | jq -r '.value'
+          -H "Authorization: Bearer $(cat token.json)") | jq -r '.value'
 
           if [[ $test_string == "Creation Test" ]]
           then
@@ -162,7 +162,7 @@ jobs:
           curl -k -X 'PUT' \
           'https://127.0.0.1:8443/automation/api/v2/nodes/sdk-py-provider-alldata/test_nodes/test_int' \
           -H 'accept: */*' \
-          -H "Authorization: Bearer $(cat token.json | jq '.access_token')" \
+          -H "Authorization: Bearer $(cat token.json)" \
           -H 'Content-Type: application/json' \
           -d '{
           "type": "int",
@@ -172,7 +172,7 @@ jobs:
           curl -k -X 'PUT' \
           'https://127.0.0.1:8443/automation/api/v2/nodes/sdk-py-provider-alldata/test_nodes/test_string' \
           -H 'accept: */*' \
-          -H "Authorization: Bearer $(cat token.json | jq '.access_token')" \
+          -H "Authorization: Bearer $(cat token.json)" \
           -H 'Content-Type: application/json' \
           -d '{
           "type": "string",
@@ -183,7 +183,7 @@ jobs:
           test_int=$(curl -k -X 'GET' \
           'https://127.0.0.1:8443/automation/api/v2/nodes/sdk-py-provider-alldata/test_nodes/test_int' \
           -H 'accept: application/json' \
-          -H "Authorization: Bearer $(cat token.json | jq '.access_token')") | jq -r '.value'
+          -H "Authorization: Bearer $(cat token.json)") | jq -r '.value'
 
           if [[ $test_int == 1 ]]
           then
@@ -195,7 +195,7 @@ jobs:
           test_string=$(curl -s -k -X 'GET' \
           'https://127.0.0.1:8443/automation/api/v2/nodes/sdk-py-provider-alldata/test_nodes/test_string' \
           -H 'accept: application/json' \
-          -H "Authorization: Bearer $(cat token.json | jq '.access_token')") | jq -r '.value'
+          -H "Authorization: Bearer $(cat token.json)") | jq -r '.value'
 
           if [[ $test_string == "Write Test" ]]
           then
