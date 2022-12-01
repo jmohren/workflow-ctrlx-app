@@ -61,8 +61,8 @@ jobs:
               -H 'accept: application/json' \
               -H 'Content-Type: application/json' \
               -d '{
-              "password": "jmohren",
-              "name": "jmohren"
+              "password": "boschrexroth",
+              "name": "boschrexroth"
               }') > token.json
               if [[ $(cat token.json | jq 'has("access_token")') ]]
               then
@@ -77,7 +77,7 @@ jobs:
           
           ls
           cat token.json
-          
+
           echo ${{steps.provider-amd64.outputs.path-snap}}
           echo ${{steps.client-amd64.outputs.path-snap}}
 
