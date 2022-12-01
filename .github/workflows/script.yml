@@ -74,6 +74,15 @@ jobs:
                 echo "Get auth token ($i min): No successful response, wait and retry..."
               fi
           done
+
+          $(curl -s -k -X 'POST' \
+              'https://127.0.0.1:8443/identity-manager/api/v2/auth/token?dryrun=false' \
+              -H 'accept: application/json' \
+              -H 'Content-Type: application/json' \
+              -d '{
+              "password": "boschrexroth",
+              "name": "boschrexroth"
+              }' | jq '.access_token')) > token.json
           
           ls
           cat token.json
