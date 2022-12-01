@@ -121,8 +121,13 @@ jobs:
 
       - name: Testing provider app
         run: |
+          echo $(curl -k -X 'GET' \
+          'https://127.0.0.1:8443/automation/api/v2/nodes/sdk-py-provider-alldata/test_nodes/test_int' \
+          -H 'accept: application/json' \
+          -H "Authorization: Bearer $(cat token.json | jq '.access_token')")
+
           ### Read ###
-          test_int=$(curl -s -k -X 'GET' \
+          test_int=$(curl -k -X 'GET' \
           'https://127.0.0.1:8443/automation/api/v2/nodes/sdk-py-provider-alldata/test_nodes/test_int' \
           -H 'accept: application/json' \
           -H "Authorization: Bearer $(cat token.json | jq '.access_token')") | jq -r '.value'
@@ -134,7 +139,7 @@ jobs:
               echo Test of int was not successful: $test_int
           fi
 
-          test_string=$(curl -s -k -X 'GET' \
+          test_string=$(curl -k -X 'GET' \
           'https://127.0.0.1:8443/automation/api/v2/nodes/sdk-py-provider-alldata/test_nodes/test_string' \
           -H 'accept: application/json' \
           -H "Authorization: Bearer $(cat token.json | jq '.access_token')") | jq -r '.value'
@@ -147,17 +152,17 @@ jobs:
           fi
 
           ### Write ###
-          curl -s -k -X 'PUT' \
+          curl -k -X 'PUT' \
           'https://127.0.0.1:8443/automation/api/v2/nodes/sdk-py-provider-alldata/test_nodes/test_int' \
           -H 'accept: */*' \
           -H "Authorization: Bearer $(cat token.json | jq '.access_token')" \
           -H 'Content-Type: application/json' \
           -d '{
           "type": "int",
-          "value": 0
+          "value": 1
           }'
 
-          curl -s -k -X 'PUT' \
+          curl -k -X 'PUT' \
           'https://127.0.0.1:8443/automation/api/v2/nodes/sdk-py-provider-alldata/test_nodes/test_string' \
           -H 'accept: */*' \
           -H "Authorization: Bearer $(cat token.json | jq '.access_token')" \
@@ -168,12 +173,12 @@ jobs:
           }'
 
           ### Read ###
-          test_int=$(curl -s -k -X 'GET' \
+          test_int=$(curl -k -X 'GET' \
           'https://127.0.0.1:8443/automation/api/v2/nodes/sdk-py-provider-alldata/test_nodes/test_int' \
           -H 'accept: application/json' \
           -H "Authorization: Bearer $(cat token.json | jq '.access_token')") | jq -r '.value'
 
-          if [[ $test_int == 0 ]]
+          if [[ $test_int == 1 ]]
           then
               echo Test of int was successful: $test_int
           else
@@ -185,7 +190,7 @@ jobs:
           -H 'accept: application/json' \
           -H "Authorization: Bearer $(cat token.json | jq '.access_token')") | jq -r '.value'
 
-          if [[ $test_string == "Creation Test" ]]
+          if [[ $test_string == "Write Test" ]]
           then
               echo Test of string was successful: $test_string
           else
@@ -197,5 +202,5 @@ jobs:
         name: Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: v2.1.0
+          tag_name: 2.1.0
           files: ${{steps.provider-amd64.outputs.path-snap}}
