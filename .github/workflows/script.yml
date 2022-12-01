@@ -40,7 +40,7 @@ jobs:
         uses: boschrexroth/ctrlx-actions/build-snap@v1
         with: 
             architecture: amd64
-            path-app-file: ${{ env.PATH_APPS }}/datalayer.provider.all-data
+            path-app-files: ${{ env.PATH_APPS }}/datalayer.provider.all-data
 
       - 
         name: Build datalayer.client app
@@ -48,7 +48,7 @@ jobs:
         uses: boschrexroth/ctrlx-actions/build-snap@v1
         with: 
             architecture: amd64
-            path-app-file: ${{ env.PATH_APPS }}/datalayerclient
+            path-app-files: ${{ env.PATH_APPS }}/datalayerclient
 
       - name: Install apps
         run: |
