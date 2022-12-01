@@ -23,7 +23,7 @@ jobs:
           repository: boschrexroth/ctrlx-os-imgs
           ssh-key: ${{ secrets.JMOHREN_KEY }}
           lfs: true
-          path: $PATH_IMGS
+          path: PATH_IMGS
 
       - name: Install apps
         run: |
@@ -34,7 +34,7 @@ jobs:
         name: Start ctrlX OS
         uses: jmohren/ctrlx-actions/start-ctrlx-os@v1
         with:
-          path-img: $PATH_IMGS
+          path-img: PATH_IMGS
 
       - 
         name: Build datalayer.provider app
