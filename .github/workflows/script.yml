@@ -74,7 +74,10 @@ jobs:
                 echo "Get auth token ($i min): No successful response, wait and retry..."
               fi
           done
-          #
+          
+          ls
+          cat token.json
+          
           echo ${{steps.provider-amd64.outputs.path-snap}}
           echo ${{steps.client-amd64.outputs.path-snap}}
 
@@ -113,19 +116,14 @@ jobs:
           # sdk-py-client-light_2.1.0_amd64.snap
 
           # sleep 2m
-          # echo $(curl -k -X 'GET' \
-          # 'https://127.0.0.1:8443/package-manager/api/v1/packages' \
-          # -H 'accept: application/json' \
-          # -H "Authorization: Bearer $(cat token.json | jq '.access_token')")
+          echo $(curl -k -X 'GET' \
+          'https://127.0.0.1:8443/package-manager/api/v1/packages' \
+          -H 'accept: application/json' \
+          -H "Authorization: Bearer $(cat token.json | jq '.access_token')")
         shell: bash
 
       - name: Testing provider app
         run: |
-          echo $(curl -k -X 'GET' \
-          'https://127.0.0.1:8443/automation/api/v2/nodes/sdk-py-provider-alldata/test_nodes/test_int' \
-          -H 'accept: application/json' \
-          -H "Authorization: Bearer $(cat token.json | jq '.access_token')")
-
           ### Read ###
           test_int=$(curl -k -X 'GET' \
           'https://127.0.0.1:8443/automation/api/v2/nodes/sdk-py-provider-alldata/test_nodes/test_int' \
