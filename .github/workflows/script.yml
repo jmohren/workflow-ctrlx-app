@@ -76,14 +76,23 @@ jobs:
           done
 
           echo Before
-          echo $(curl -s -k -X 'POST' \
-              'https://127.0.0.1:8443/identity-manager/api/v2/auth/token?dryrun=false' \
-              -H 'accept: application/json' \
-              -H 'Content-Type: application/json' \
-              -d '{
-              "password": "boschrexroth",
-              "name": "boschrexroth"
-              }') | jq '.access_token' > token.json
+          # echo $(curl -s -k -X 'POST' \
+          #     'https://127.0.0.1:8443/identity-manager/api/v2/auth/token?dryrun=false' \
+          #     -H 'accept: application/json' \
+          #     -H 'Content-Type: application/json' \
+          #     -d '{
+          #     "password": "boschrexroth",
+          #     "name": "boschrexroth"
+          #     }') | jq '.access_token' > token.json
+          #Get Token
+          echo $(curl -k -X 'POST' \
+          'https://127.0.0.1:8443/identity-manager/api/v2/auth/token?dryrun=false' \
+          -H 'accept: application/json' \
+          -H 'Content-Type: application/json' \
+          -d '{
+          "password": "boschrexroth",
+          "name": "boschrexroth"
+          }' | jq -r '.access_token') > token.json
           echo after
           
           ls
@@ -125,12 +134,12 @@ jobs:
 
           # sdk-py-provider-alldata_2.1.0_amd64.snap
           # sdk-py-client-light_2.1.0_amd64.snap
-
           # sleep 2m
-          echo $(curl -k -X 'GET' \
+
+          echo $(curl -X 'GET' \
           'https://127.0.0.1:8443/package-manager/api/v1/packages' \
           -H 'accept: application/json' \
-          -H "Authorization: Bearer $(cat token.json)")
+          -H 'Authorization: Bearer $(cat token.json)')
         shell: bash
 
       - name: Testing provider app
