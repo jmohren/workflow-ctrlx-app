@@ -137,23 +137,10 @@ jobs:
       - name: Testing provider app
         run: |
           ### Read ###
-          #'https://127.0.0.1:8443/automation/api/v2/nodes/sdk-py-provider-alldata/prediction/anomaly'
-          echo Normal
-          echo $(curl -k -X 'GET' \
+          test_int=$(curl -s -k -X 'GET' \
           'https://127.0.0.1:8443/automation/api/v2/nodes/sdk-py-provider-alldata/test_nodes/test_int' \
           -H 'accept: application/json' \
-          -H "Authorization: Bearer $(cat token.json)")
-
-          echo format
-          echo $(curl -k -X 'GET' \
-          'https://127.0.0.1:8443/automation/api/v2/nodes/sdk-py-provider-alldata%2Ftest_nodes%2Ftest_int' \
-          -H 'accept: application/json' \
-          -H "Authorization: Bearer $(cat token.json)")
-          
-          test_int=$(curl -k -X 'GET' \
-          'https://127.0.0.1:8443/automation/api/v2/nodes/sdk-py-provider-alldata/test_nodes/test_int' \
-          -H 'accept: application/json' \
-          -H 'Authorization: Bearer $(cat token.json)' | jq -r '.value')
+          -H "Authorization: Bearer $(cat token.json)" | jq -r '.value')
 
           if [[ $test_int == 0 ]]
           then
@@ -162,7 +149,7 @@ jobs:
               echo Test of int was not successful: $test_int
           fi
 
-          test_string=$(curl -k -X 'GET' \
+          test_string=$(curl -s -k -X 'GET' \
           'https://127.0.0.1:8443/automation/api/v2/nodes/sdk-py-provider-alldata/test_nodes/test_string' \
           -H 'accept: application/json' \
           -H "Authorization: Bearer $(cat token.json)" | jq -r '.value')
@@ -175,7 +162,7 @@ jobs:
           fi
 
           ### Write ###
-          curl -k -X 'PUT' \
+          curl -s -k -X 'PUT' \
           'https://127.0.0.1:8443/automation/api/v2/nodes/sdk-py-provider-alldata/test_nodes/test_int' \
           -H 'accept: */*' \
           -H "Authorization: Bearer $(cat token.json)" \
@@ -185,7 +172,7 @@ jobs:
           "value": 1
           }'
 
-          curl -k -X 'PUT' \
+          curl -s -k -X 'PUT' \
           'https://127.0.0.1:8443/automation/api/v2/nodes/sdk-py-provider-alldata/test_nodes/test_string' \
           -H 'accept: */*' \
           -H "Authorization: Bearer $(cat token.json)" \
@@ -196,7 +183,7 @@ jobs:
           }'
 
           ### Read ###
-          test_int=$(curl -k -X 'GET' \
+          test_int=$(curl -s -k -X 'GET' \
           'https://127.0.0.1:8443/automation/api/v2/nodes/sdk-py-provider-alldata/test_nodes/test_int' \
           -H 'accept: application/json' \
           -H "Authorization: Bearer $(cat token.json)" | jq -r '.value')
