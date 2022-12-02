@@ -32,7 +32,8 @@ parts:
         - libzmq5
       override-pull: |
         mkdir -p ../../../tmp/
-        curl -s https://api.github.com/repos/boschrexroth/ctrlx-automation-sdk/releases/latest | grep "browser_download_url.*deb" | cut -d : -f 2,3 | tr -d \" | wget -qi - -O ../../../tmp/ctrlx-datalayer.deb
+        wget https://github.com/boschrexroth/ctrlx-automation-sdk/releases/download/1.18.0/ctrlx-datalayer-1.9.1.deb -O ../../../tmp/ctrlx-datalayer.deb
+        #curl -s -u jmohren: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 https://api.github.com/repos/boschrexroth/ctrlx-automation-sdk/releases/latest | grep "browser_download_url.*deb" | cut -d : -f 2,3 | tr -d \" | wget -qi - -O ../../../tmp/ctrlx-datalayer.deb
         snapcraftctl pull
       override-prime: |
         rm -rf ../../../tmp
