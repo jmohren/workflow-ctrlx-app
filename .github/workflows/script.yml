@@ -95,7 +95,7 @@ jobs:
 
           #Allow installing from unknown sources
           echo Enable installation from unknown sources
-          curl -s -k -X 'PUT' \
+          curl -k -X 'PUT' \
           'https://127.0.0.1:8443/package-manager/api/v1/settings' \
           -H 'accept: */*' \
           -H "Authorization: Bearer $(cat token.json)" \
@@ -137,6 +137,7 @@ jobs:
       - name: Testing provider app
         run: |
           ### Read ###
+          #'https://127.0.0.1:8443/automation/api/v2/nodes/sdk-py-provider-alldata/prediction/anomaly'
           echo Normal
           echo $(curl -k -X 'GET' \
           'https://127.0.0.1:8443/automation/api/v2/nodes/sdk-py-provider-alldata/test_nodes/test_int' \
