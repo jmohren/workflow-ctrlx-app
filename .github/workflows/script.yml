@@ -32,7 +32,7 @@ jobs:
         name: Start ctrlX OS
         uses: jmohren/ctrlx-actions/start-ctrlx-os@v1
         with:
-          path-img: ${{ env.PATH_IMGS }}
+          # path-img: ${{ env.PATH_IMGS }}
 
       - 
         name: Build datalayer.provider app
