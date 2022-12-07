@@ -5,15 +5,15 @@ The following will elaborate on the architecture to start a workflow with ctrlX 
 
 ## Workflow Architecture
 
-![alt text](https://github.com/boschrexroth/ctrlx-imgs/pictures/workflow-architecture.png)
+![404 image not found](https://github.com/boschrexroth/ctrlx-imgs/blob/master/pictures/workflow-architecture.png)
 
 ## Create New Access
 
 Create new ssh key pair:
-![alt text](https://github.com/boschrexroth/ctrlx-imgs/pictures/ssh-key-pair.png)
+![404 image not found](https://github.com/boschrexroth/ctrlx-imgs/blob/master/pictures/ssh-key-pair.png)
 
 Deposite public key in the ctrlx-imgs repository under settings and deploy keys:
-![alt text](https://github.com/boschrexroth/ctrlx-imgs/pictures/github-public-key.png)
+![404 image not found](https://github.com/boschrexroth/ctrlx-imgs/blob/master/pictures/github-public-key.png)
 
 Deposite private key in the customers repository under settings, secrets and actions (either in our GitHub organisation or their GitHub organisation):
-![alt text](https://github.com/boschrexroth/ctrlx-imgs/pictures/github-private-key.png)
+![404 image not found](https://github.com/boschrexroth/ctrlx-imgs/blob/master/pictures/github-private-key.png)
