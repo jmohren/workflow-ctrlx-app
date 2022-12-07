@@ -19,14 +19,14 @@ jobs:
         with: 
           path: ${{ env.PATH_APPS }}
 
-      - 
-        name: Checkout ctrlX OS images
-        uses: actions/checkout@v3
-        with:
-          repository: boschrexroth/ctrlx-os-imgs
-          ssh-key: ${{ secrets.JMOHREN_KEY }}
-          lfs: true
-          path: ${{ env.PATH_IMGS }}
+      # - 
+      #   name: Checkout ctrlX OS images
+      #   uses: actions/checkout@v3
+      #   with:
+      #     repository: boschrexroth/ctrlx-os-imgs
+      #     ssh-key: ${{ secrets.JMOHREN_KEY }}
+      #     lfs: true
+      #     path: ${{ env.PATH_IMGS }}
 
       - 
         name: Start ctrlX OS
