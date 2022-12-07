@@ -10,10 +10,17 @@ The following will elaborate on the architecture to start a workflow with ctrlX 
 ## Create New Access
 
 Create new ssh key pair:
+
+```bash
+ssh-keygen -t rsa
+```
+
 ![404 image not found](https://github.com/jmohren/workflow-ctrlx-app/blob/master/pictures/ssh-key-pair.png)
 
-Deposite public key in the ctrlx-imgs repository under settings and deploy keys:
+Deposite public key in the ctrlx-imgs repository under settings and [deploy keys](https://github.com/boschrexroth/ctrlx-os-imgs/settings/keys/new):
+
 ![404 image not found](https://github.com/jmohren/workflow-ctrlx-app/blob/master/pictures/github-public-key.png)
 
 Deposite private key in the customers repository under settings, secrets and actions (either in our GitHub organisation or their GitHub organisation):
+
 ![404 image not found](https://github.com/jmohren/workflow-ctrlx-app/blob/master/pictures/github-private-key.png)
