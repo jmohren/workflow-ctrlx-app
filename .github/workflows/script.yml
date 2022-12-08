@@ -27,12 +27,14 @@ jobs:
           ssh-key: ${{ secrets.JMOHREN_KEY }}
           lfs: true
           path: ${{ env.PATH_IMGS }}
-
+      #-netdev user,id=mynet0,net=192.168.76.0/24,dhcpstart=192.168.76.9
       - 
         name: Start ctrlX OS
         uses: jmohren/ctrlx-actions/start-ctrlx-os@v1
         with:
           path-img: ${{ env.PATH_IMGS }}
+          netdev-id: "mynet0"
+          netdev-options: ",net=192.168.76.0/24,dhcpstart=192.168.76.9"
 
       - 
         name: Build datalayer.provider app
