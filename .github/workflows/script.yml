@@ -34,7 +34,7 @@ jobs:
         with:
           path-img: ${{ env.PATH_IMGS }}
           netdev-id: "mynet0"
-          netdev-options: ",net=192.168.76.0/24,dhcpstart=192.168.76.9"
+          netdev-options: "net=192.168.76.0/24,dhcpstart=192.168.76.9"
 
       - 
         name: Build datalayer.provider app
