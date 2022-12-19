@@ -114,7 +114,7 @@ jobs:
           then
               echo Test of int was successful: $test_int
           else
-              echo Test of int was not successful: $test_int
+              echo Test of int was not successful: $test_int && exit 1
           fi
 
           test_string=$(curl -s -k -X 'GET' \
@@ -126,7 +126,7 @@ jobs:
           then
               echo Test of string was successful: $test_string
           else
-              echo Test of string was not successful: $test_string
+              echo Test of string was not successful: $test_string && exit 1
           fi
 
           ### Write ###
@@ -160,7 +160,7 @@ jobs:
           then
               echo Test of int was successful: $test_int
           else
-              echo Test of int was not successful: $test_int
+              echo Test of int was not successful: $test_int && exit 1
           fi
 
           test_string=$(curl -s -k -X 'GET' \
@@ -172,7 +172,7 @@ jobs:
           then
               echo Test of string was successful: $test_string
           else
-              echo Test of string was not successful: $test_string
+              echo Test of string was not successful: $test_string && exit 1
           fi
         shell: bash
 
