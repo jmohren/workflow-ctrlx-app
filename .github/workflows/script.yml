@@ -70,7 +70,7 @@ jobs:
 
           echo Before
           #Get Token
-          echo $(curl -k -X 'POST' \
+          echo $(curl -s -k -X 'POST' \
           'https://${{ env.URL }}:${{ env.PORT }}/identity-manager/api/v2/auth/token?dryrun=false' \
           -H 'accept: application/json' \
           -H 'Content-Type: application/json' \
@@ -78,17 +78,10 @@ jobs:
           "password": "boschrexroth",
           "name": "boschrexroth"
           }' | jq -r '.access_token') > token.json
-          echo after
-          
-          ls
-          cat token.json
-
-          echo ${{steps.provider-amd64.outputs.path-snap}}
-          echo ${{steps.client-amd64.outputs.path-snap}}
 
           #Allow installing from unknown sources
           echo Enable installation from unknown sources
-          curl -k -X 'PUT' \
+          curl -s -k -X 'PUT' \
           'https://${{ env.URL }}:${{ env.PORT }}/package-manager/api/v1/settings' \
           -H 'accept: */*' \
           -H "Authorization: Bearer $(cat token.json)" \
@@ -98,7 +91,7 @@ jobs:
           }'
 
           echo Install provider app
-          echo $(curl -k -X 'POST' \
+          echo $(curl -s -k -X 'POST' \
           'https://${{ env.URL }}:${{ env.PORT }}/package-manager/api/v1/packages' \
           -H 'accept: */*' \
           -H 'Content-Type: multipart/form-data' \
@@ -106,25 +99,7 @@ jobs:
           -F 'file=@${{steps.provider-amd64.outputs.path-snap}}' \
           -F 'update=false')
 
-          sleep 2m
-
-          # echo Install client app
-          # echo $(curl -k -X 'POST' \
-          # 'https://${{ env.URL }}:${{ env.PORT }}/package-manager/api/v1/packages' \
-          # -H 'accept: */*' \
-          # -H 'Content-Type: multipart/form-data' \
-          # -H "Authorization: Bearer $(cat token.json)" \
-          # -F 'file=@${{steps.client-amd64.outputs.path-snap}}' \
-          # -F 'update=false')
-
-          # sdk-py-provider-alldata_2.1.0_amd64.snap
-          # sdk-py-client-light_2.1.0_amd64.snap
-          # sleep 2m
-
-          echo $(curl -k -X 'GET' \
-          'https://${{ env.URL }}:${{ env.PORT }}/package-manager/api/v1/packages' \
-          -H 'accept: application/json' \
-          -H "Authorization: Bearer $(cat token.json)")
+          sleep 1m
         shell: bash
 
       - name: Testing provider app
