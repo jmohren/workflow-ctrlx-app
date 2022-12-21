@@ -181,7 +181,7 @@ jobs:
           fi
 
           #rename snap file
-          mv sdk-py-provider-alldata_2.1.0_amd64.snap sdk-py-provider-alldata_amd64.snap
+          mv ${{ env.PATH_APPS }}/sdk-py-provider-alldata_2.1.0_amd64.snap ${{ env.PATH_APPS }}/sdk-py-provider-alldata_amd64.snap
         shell: bash
 
       - 
