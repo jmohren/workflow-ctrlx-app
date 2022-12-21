@@ -117,7 +117,7 @@ jobs:
 
           echo response
           echo $response
-          test_int = $response | jq -r '.value'
+          test_int = echo $response | jq -r '.value'
           echo test_int
           echo $test_int
 
@@ -133,7 +133,7 @@ jobs:
           -H 'accept: application/json' \
           -H "Authorization: Bearer $(cat token.json)" | jq -r '.value')
 
-          test_string = $response | jq -r '.value'
+          test_string = echo $response | jq -r '.value'
 
           if [[ $test_string == "Creation Test" ]]
           then
@@ -169,7 +169,7 @@ jobs:
           -H 'accept: application/json' \
           -H "Authorization: Bearer $(cat token.json)" | jq -r '.value')
 
-          test_int = $response | jq -r '.value'
+          test_int = echo $response | jq -r '.value'
 
           if [[ $test_int == 1 ]]
           then
@@ -183,7 +183,7 @@ jobs:
           -H 'accept: application/json' \
           -H "Authorization: Bearer $(cat token.json)" | jq -r '.value')
 
-          test_string = $response | jq -r '.value'
+          test_string = echo $response | jq -r '.value'
 
           if [[ $test_string == "Write Test" ]]
           then
