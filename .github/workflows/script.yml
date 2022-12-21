@@ -45,6 +45,11 @@ jobs:
 
       - name: Install apps
         run: |
+          echo app dir
+          echo ${{steps.provider-amd64.outputs.path-snap}}
+          echo ls
+          ls
+          
           #Get auth token
           for i in {1..16}
           do
