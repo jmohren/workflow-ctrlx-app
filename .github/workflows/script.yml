@@ -113,7 +113,10 @@ jobs:
           test_int=$(curl -k -X 'GET' \
           'https://${{ env.URL }}:${{ env.PORT }}/automation/api/v2/nodes/sdk-py-provider-alldata/test_nodes/test_int' \
           -H 'accept: application/json' \
-          -H "Authorization: Bearer $(cat token.json)" | jq -r '.value')
+          -H "Authorization: Bearer $(cat token.json)")
+
+          echo $test_int
+          echo $test_int | jq -r '.value'
 
           if [[ $test_int == 0 ]]
           then
