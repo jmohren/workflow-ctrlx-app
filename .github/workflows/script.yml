@@ -104,7 +104,7 @@ jobs:
           -F 'file=@${{steps.provider-amd64.outputs.path-snap}}' \
           -F 'update=false')
 
-          sleep 1m
+          sleep 2m
         shell: bash
 
       - name: Testing provider app
