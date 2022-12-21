@@ -62,7 +62,7 @@ jobs:
                 echo "Get auth token ($i min): Retrieved authentication token sucessfully" && break
               elif [[ $i == 16 ]]
               then
-                echo ::error::"Get auth token ($i min): Timeout no connection possible" 
+                echo ::error::"Get auth token ($i min): Timeout no connection possible" && exit 1
               else
                 echo "Get auth token ($i min): No successful response, wait and retry..."
               fi
@@ -105,7 +105,7 @@ jobs:
       - name: Testing provider app
         run: |
           ### Read ###
-          test_int=$(curl -s -k -X 'GET' \
+          test_int=$(curl -k -X 'GET' \
           'https://${{ env.URL }}:${{ env.PORT }}/automation/api/v2/nodes/sdk-py-provider-alldata/test_nodes/test_int' \
           -H 'accept: application/json' \
           -H "Authorization: Bearer $(cat token.json)" | jq -r '.value')
@@ -114,10 +114,10 @@ jobs:
           then
               echo Test of int was successful: $test_int
           else
-              echo Test of int was not successful: $test_int 
+              echo Test of int was not successful: $test_int && exit 1
           fi
 
-          test_string=$(curl -s -k -X 'GET' \
+          test_string=$(curl -k -X 'GET' \
           'https://${{ env.URL }}:${{ env.PORT }}/automation/api/v2/nodes/sdk-py-provider-alldata/test_nodes/test_string' \
           -H 'accept: application/json' \
           -H "Authorization: Bearer $(cat token.json)" | jq -r '.value')
@@ -126,11 +126,11 @@ jobs:
           then
               echo Test of string was successful: $test_string
           else
-              echo Test of string was not successful: $test_string 
+              echo Test of string was not successful: $test_string && exit 1
           fi
 
           ### Write ###
-          curl -s -k -X 'PUT' \
+          curl -k -X 'PUT' \
           'https://${{ env.URL }}:${{ env.PORT }}/automation/api/v2/nodes/sdk-py-provider-alldata/test_nodes/test_int' \
           -H 'accept: */*' \
           -H "Authorization: Bearer $(cat token.json)" \
@@ -140,7 +140,7 @@ jobs:
           "value": 1
           }'
 
-          curl -s -k -X 'PUT' \
+          curl -k -X 'PUT' \
           'https://${{ env.URL }}:${{ env.PORT }}/automation/api/v2/nodes/sdk-py-provider-alldata/test_nodes/test_string' \
           -H 'accept: */*' \
           -H "Authorization: Bearer $(cat token.json)" \
@@ -151,7 +151,7 @@ jobs:
           }'
 
           ### Read ###
-          test_int=$(curl -s -k -X 'GET' \
+          test_int=$(curl -k -X 'GET' \
           'https://${{ env.URL }}:${{ env.PORT }}/automation/api/v2/nodes/sdk-py-provider-alldata/test_nodes/test_int' \
           -H 'accept: application/json' \
           -H "Authorization: Bearer $(cat token.json)" | jq -r '.value')
@@ -160,10 +160,10 @@ jobs:
           then
               echo Test of int was successful: $test_int
           else
-              echo Test of int was not successful: $test_int 
+              echo Test of int was not successful: $test_int && exit 1
           fi
 
-          test_string=$(curl -s -k -X 'GET' \
+          test_string=$(curl -k -X 'GET' \
           'https://${{ env.URL }}:${{ env.PORT }}/automation/api/v2/nodes/sdk-py-provider-alldata/test_nodes/test_string' \
           -H 'accept: application/json' \
           -H "Authorization: Bearer $(cat token.json)" | jq -r '.value')
@@ -172,7 +172,7 @@ jobs:
           then
               echo Test of string was successful: $test_string
           else
-              echo Test of string was not successful: $test_string 
+              echo Test of string was not successful: $test_string && exit 1
           fi
 
           #rename snap file
