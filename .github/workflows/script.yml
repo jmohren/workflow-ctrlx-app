@@ -183,12 +183,13 @@ jobs:
           fi
 
           #rename snap file
-          mv ${{ env.PATH_APPS }}/datalayer.provider.all-data/sdk-py-provider-alldata_2.1.0_amd64.snap ${{ env.PATH_APPS }}/datalayer.provider.all-data/sdk-py-provider-alldata_amd64.snap
+          #mv ${{ env.PATH_APPS }}/datalayer.provider.all-data/sdk-py-provider-alldata_2.1.0_amd64.snap ${{ env.PATH_APPS }}/datalayer.provider.all-data/sdk-py-provider-alldata_amd64.snap
+          mv ${{steps.provider-amd64.outputs.path-snap}} ${{ env.PATH_APPS }}/datalayer.provider.all-data/sdk-py-provider-alldata_amd64.snap
         shell: bash
 
       - 
         name: Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: 2.1.0
+          tag_name: 2.1.1
           files: ${{ env.PATH_APPS }}/datalayer.provider.all-data/sdk-py-provider-alldata_amd64.snap
