@@ -110,15 +110,11 @@ jobs:
       - name: Testing provider app
         run: |
           ### Read ###
-          response=$(curl -k -X 'GET' \
+          test_int=$(curl -k -X 'GET' \
           'https://${{ env.URL }}:${{ env.PORT }}/automation/api/v2/nodes/sdk-py-provider-alldata/test_nodes/test_int' \
           -H 'accept: application/json' \
-          -H "Authorization: Bearer $(cat token.json)")
+          -H "Authorization: Bearer $(cat token.json)" | jq -r '.value')
 
-          echo response
-          echo $response
-          test_int = echo $response | jq -r '.value'
-          echo test_int
           echo $test_int
 
           if [[ $test_int == 0 ]]
@@ -128,12 +124,10 @@ jobs:
               echo Test of int was not successful: $test_int && exit 1
           fi
 
-          response=$(curl -k -X 'GET' \
+          test_string=$(curl -k -X 'GET' \
           'https://${{ env.URL }}:${{ env.PORT }}/automation/api/v2/nodes/sdk-py-provider-alldata/test_nodes/test_string' \
           -H 'accept: application/json' \
           -H "Authorization: Bearer $(cat token.json)" | jq -r '.value')
-
-          test_string = echo $response | jq -r '.value'
 
           if [[ $test_string == "Creation Test" ]]
           then
@@ -164,12 +158,10 @@ jobs:
           }'
 
           ### Read ###
-          response=$(curl -k -X 'GET' \
+          test_int=$(curl -k -X 'GET' \
           'https://${{ env.URL }}:${{ env.PORT }}/automation/api/v2/nodes/sdk-py-provider-alldata/test_nodes/test_int' \
           -H 'accept: application/json' \
           -H "Authorization: Bearer $(cat token.json)" | jq -r '.value')
-
-          test_int = echo $response | jq -r '.value'
 
           if [[ $test_int == 1 ]]
           then
@@ -178,12 +170,10 @@ jobs:
               echo Test of int was not successful: $test_int && exit 1
           fi
 
-          response=$(curl -k -X 'GET' \
+          test_string=$(curl -k -X 'GET' \
           'https://${{ env.URL }}:${{ env.PORT }}/automation/api/v2/nodes/sdk-py-provider-alldata/test_nodes/test_string' \
           -H 'accept: application/json' \
           -H "Authorization: Bearer $(cat token.json)" | jq -r '.value')
-
-          test_string = echo $response | jq -r '.value'
 
           if [[ $test_string == "Write Test" ]]
           then
