@@ -1,0 +1,200 @@
+
+name: builder
+
+on: 
+  push:
+    branches: 
+    - develop
+
+jobs:
+  build-and-test-app:
+    runs-on: ubuntu-20.04 #ubuntu-latest
+
+    steps:
+      - name: Set env
+        run: |
+          echo "PATH_APPS=$(pwd)/apps" >> $GITHUB_ENV
+          echo "PATH_IMGS=$(pwd)/imgs" >> $GITHUB_ENV
+          echo "URL=127.0.0.1" >> $GITHUB_ENV
+          echo "PORT=8443" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Checkout base repo
+        uses: actions/checkout@v3
+        with: 
+          path: ${{ env.PATH_APPS }}
+
+      - 
+        name: Checkout ctrlX OS images
+        uses: actions/checkout@v3
+        with:
+          repository: boschrexroth/ctrlx-os-imgs
+          ssh-key: ${{ secrets.JMOHREN_KEY }}
+          lfs: true
+          path: ${{ env.PATH_IMGS }}
+      - 
+        name: Start ctrlX OS
+        uses: jmohren/ctrlx-actions/start-ctrlx-os@v1
+        with:
+          path-img: ${{ env.PATH_IMGS }}
+
+      - 
+        name: Build datalayer.provider app
+        id: provider-amd64
+        uses: boschrexroth/ctrlx-actions/build-snap@v1
+        with: 
+            architecture: amd64
+            path-app-files: ${{ env.PATH_APPS }}/datalayer.provider.all-data
+
+      - name: Install apps
+        run: |
+          echo app dir
+          echo ${{steps.provider-amd64.outputs.path-snap}}
+          echo ls
+          ls
+
+          #Get auth token
+          for i in {1..16}
+          do
+            sleep 1m
+            echo $(curl -s -k -X 'POST' \
+              'https://${{ env.URL }}:${{ env.PORT }}/identity-manager/api/v2/auth/token?dryrun=false' \
+              -H 'accept: application/json' \
+              -H 'Content-Type: application/json' \
+              -d '{
+              "password": "boschrexroth",
+              "name": "boschrexroth"
+              }') > token.json
+              if [[ $(cat token.json | jq 'has("access_token")') ]]
+              then
+                echo "Get auth token ($i min): Retrieved authentication token sucessfully" && break
+              elif [[ $i == 16 ]]
+              then
+                echo ::error::"Get auth token ($i min): Timeout no connection possible" && exit 1
+              else
+                echo "Get auth token ($i min): No successful response, wait and retry..."
+              fi
+          done
+
+          echo Before
+          #Get Token
+          echo $(curl -s -k -X 'POST' \
+          'https://${{ env.URL }}:${{ env.PORT }}/identity-manager/api/v2/auth/token?dryrun=false' \
+          -H 'accept: application/json' \
+          -H 'Content-Type: application/json' \
+          -d '{
+          "password": "boschrexroth",
+          "name": "boschrexroth"
+          }' | jq -r '.access_token') > token.json
+
+          #Allow installing from unknown sources
+          echo Enable installation from unknown sources
+          curl -s -k -X 'PUT' \
+          'https://${{ env.URL }}:${{ env.PORT }}/package-manager/api/v1/settings' \
+          -H 'accept: */*' \
+          -H "Authorization: Bearer $(cat token.json)" \
+          -H 'Content-Type: application/json' \
+          -d '{
+          "allowUnknownApps": true
+          }'
+
+          echo Install provider app
+          echo $(curl -s -k -X 'POST' \
+          'https://${{ env.URL }}:${{ env.PORT }}/package-manager/api/v1/packages' \
+          -H 'accept: */*' \
+          -H 'Content-Type: multipart/form-data' \
+          -H "Authorization: Bearer $(cat token.json)" \
+          -F 'file=@${{steps.provider-amd64.outputs.path-snap}}' \
+          -F 'update=false')
+
+          sleep 2m
+        shell: bash
+
+      - name: Testing provider app
+        run: |
+          ### Read ###
+          test_int=$(curl -s -k -X 'GET' \
+          'https://${{ env.URL }}:${{ env.PORT }}/automation/api/v2/nodes/sdk-py-provider-alldata/test_nodes/test_int' \
+          -H 'accept: application/json' \
+          -H "Authorization: Bearer $(cat token.json)" | jq -r '.value')
+
+          echo $test_int
+
+          if [[ $test_int == 0 ]]
+          then
+              echo Test of int was successful: $test_int
+          else
+              echo Test of int was not successful: $test_int && exit 1
+          fi
+
+          test_string=$(curl -s -k -X 'GET' \
+          'https://${{ env.URL }}:${{ env.PORT }}/automation/api/v2/nodes/sdk-py-provider-alldata/test_nodes/test_string' \
+          -H 'accept: application/json' \
+          -H "Authorization: Bearer $(cat token.json)" | jq -r '.value')
+
+          if [[ $test_string == "Creation Test" ]]
+          then
+              echo Test of string was successful: $test_string
+          else
+              echo Test of string was not successful: $test_string && exit 1
+          fi
+
+          ### Write ###
+          curl -s -k -X 'PUT' \
+          'https://${{ env.URL }}:${{ env.PORT }}/automation/api/v2/nodes/sdk-py-provider-alldata/test_nodes/test_int' \
+          -H 'accept: */*' \
+          -H "Authorization: Bearer $(cat token.json)" \
+          -H 'Content-Type: application/json' \
+          -d '{
+          "type": "int8",
+          "value": 1
+          }'
+
+          curl -s -k -X 'PUT' \
+          'https://${{ env.URL }}:${{ env.PORT }}/automation/api/v2/nodes/sdk-py-provider-alldata/test_nodes/test_string' \
+          -H 'accept: */*' \
+          -H "Authorization: Bearer $(cat token.json)" \
+          -H 'Content-Type: application/json' \
+          -d '{
+          "type": "string",
+          "value": "Write Test"
+          }'
+
+          ### Read ###
+          test_int=$(curl -s -k -X 'GET' \
+          'https://${{ env.URL }}:${{ env.PORT }}/automation/api/v2/nodes/sdk-py-provider-alldata/test_nodes/test_int' \
+          -H 'accept: application/json' \
+          -H "Authorization: Bearer $(cat token.json)" | jq -r '.value')
+
+          if [[ $test_int == 1 ]]
+          then
+              echo Test of int was successful: $test_int
+          else
+              echo Test of int was not successful: $test_int && exit 1
+          fi
+
+          test_string=$(curl -s -k -X 'GET' \
+          'https://${{ env.URL }}:${{ env.PORT }}/automation/api/v2/nodes/sdk-py-provider-alldata/test_nodes/test_string' \
+          -H 'accept: application/json' \
+          -H "Authorization: Bearer $(cat token.json)" | jq -r '.value')
+
+          if [[ $test_string == "Write Test" ]]
+          then
+              echo Test of string was successful: $test_string
+          else
+              echo Test of string was not successful: $test_string && exit 1
+          fi
+        shell: bash
+
+  merge-to-master:
+    needs: build-and-test-app
+    runs-on: ubuntu-20.04 #ubuntu-latest
+
+    steps:
+      - name: Checkout base repo
+        uses: actions/checkout@v3
+
+      - name: pull-request
+        uses: repo-sync/pull-request@v2
+        with:
+          destination_branch: "master"
