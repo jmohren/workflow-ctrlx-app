@@ -49,12 +49,7 @@ jobs:
 
       - name: Install apps
         run: |
-          echo app dir
-          echo ${{steps.provider-amd64.outputs.path-snap}}
-          echo ls
-          ls
-
-          #Get auth token
+          echo Wait for ctrlX OS to start...
           for i in {1..16}
           do
             sleep 1m
@@ -77,8 +72,7 @@ jobs:
               fi
           done
 
-          echo Before
-          #Get Token
+          echo Get token
           echo $(curl -s -k -X 'POST' \
           'https://${{ env.URL }}:${{ env.PORT }}/identity-manager/api/v2/auth/token?dryrun=false' \
           -H 'accept: application/json' \
@@ -88,7 +82,6 @@ jobs:
           "name": "boschrexroth"
           }' | jq -r '.access_token') > token.json
 
-          #Allow installing from unknown sources
           echo Enable installation from unknown sources
           curl -s -k -X 'PUT' \
           'https://${{ env.URL }}:${{ env.PORT }}/package-manager/api/v1/settings' \
@@ -187,7 +180,7 @@ jobs:
           fi
         shell: bash
 
-  merge-to-master:
+  pull-request:
     needs: build-and-test-app
     runs-on: ubuntu-20.04 #ubuntu-latest
 
